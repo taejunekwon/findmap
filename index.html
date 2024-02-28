@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kakao Map Example</title>
+    <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=204a7c5835adfe98d1f80dbb2054fab3"></script>
+</head>
+<body>
+    <div id="map" style="width:100%;height:400px;"></div>
+    <input type="text" id="searchInput" placeholder="장소를 검색하세요">
+    <button onclick="searchPlace()">검색</button>
+    <button onclick="addCustomMarker('특정 주소 1')">특정 주소 추가 1</button>
+    <button onclick="addCustomMarker('특정 주소 2')">특정 주소 추가 2</button>
+    <button onclick="sortByDistance()">가장 가까운 순으로 정렬</button>
+
+    <div id="placeList">
+        <h2>가까운 장소 목록</h2>
+        <ul id="placeListView"></ul>
+    </div>
+
+    <script>
+        kakao.maps.load(() => {
+            let map;
+            let customMarkers = [];
+
+            const container = document.getElementById('map');
+            const options = {
+                center: new kakao.maps.LatLng(37.5665, 126.9780),
+                level: 13
+            };
+
+            map = new kakao.maps.Map(container, options);
+
+            const ps = new kakao.maps.services.Places();
+            const input = document.getElementById('searchInput');
+
+            function searchPlace() {
+                const keyword = input.value;
+                ps.keywordSearch(keyword, (data, status) => {
+                    if (status === kakao.maps.services.Status.OK) {
+                        const place = data[0];
+                        const coords = new kakao.maps.LatLng(place.y, place.x);
+
+                        map.panTo(coords);
+
+                        const marker = new kakao.maps.Marker({
+                            position: coords
+                        });
+
+                        map.markers && map.markers.forEach(marker => marker.setMap(null));
+
+                        marker.setMap(map);
+                        map.markers = [marker];
+                    }
+                });
+            }
+
+            function addCustomMarker(address) {
+                const geocoder = new kakao.maps.services.Geocoder();
+                geocoder.addressSearch(address, (result, status) => {
+                    if (status === kakao.maps.services.Status.OK) {
+                        const customCoords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                        const customMarker = new kakao.maps.Marker({
+                            position: customCoords
+                        });
+
+                        customMarker.setMap(map);
+                        customMarkers.push(customMarker);
+
+                        sortByDistance();
+                    }
+                });
+            }
+
+            function sortByDistance() {
+                const centerCoords = map.getCenter();
+
+                customMarkers.sort((a, b) => {
+                    const distanceA = kakao.maps.services.DistanceMap.getDistance(centerCoords, a.getPosition());
+                    const distanceB = kakao.maps.services.DistanceMap.getDistance(centerCoords, b.getPosition());
+                    return distanceA - distanceB;
+                });
+
+                updatePlaceList();
+            }
+
+            function updatePlaceList() {
+                const placeListView = document.getElementById('placeListView');
+                placeListView.innerHTML = '';
+
+                customMarkers.forEach(marker => {
+                    const distance = kakao.maps.services.DistanceMap.getDistance(map.getCenter(), marker.getPosition());
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `거리: ${distance.toFixed(2)}m`;
+                    placeListView.appendChild(listItem);
+                });
+            }
+        });
+    </script>
+</body>
+</html>
