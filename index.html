@@ -33,7 +33,7 @@
 
                 map = new kakao.maps.Map(container, options);
 
-                const ps = new kakao.maps.services.places.Places();
+                const ps = new kakao.maps.services.places.Places(); // 수정된 부분
                 const input = document.getElementById('searchInput');
 
                 window.searchPlace = function() {
