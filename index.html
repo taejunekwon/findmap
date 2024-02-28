@@ -20,8 +20,8 @@
     </div>
 
     <script>
-        function initMap() {
-            kakao.maps.load(() => {
+        kakao.maps.load(() => {
+            function initMap() {
                 let map;
                 let customMarkers = [];
 
@@ -97,10 +97,11 @@
                         placeListView.appendChild(listItem);
                     });
                 }
-            });
-        }
+            }
 
-        kakao.maps.load(initMap);
+            // Kakao Maps API를 로드한 후 initMap 함수를 호출
+            kakao.maps.load(initMap);
+        });
     </script>
 </body>
 </html>
