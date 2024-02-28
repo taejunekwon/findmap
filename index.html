@@ -77,8 +77,8 @@
                 const centerCoords = map.getCenter();
 
                 customMarkers.sort((a, b) => {
-                    const distanceA = kakao.maps.services.DistanceMap.getDistance(centerCoords, a.getPosition());
-                    const distanceB = kakao.maps.services.DistanceMap.getDistance(centerCoords, b.getPosition());
+                    const distanceA = kakao.maps.services.Distance.getDistance(centerCoords, a.getPosition());
+                    const distanceB = kakao.maps.services.Distance.getDistance(centerCoords, b.getPosition());
                     return distanceA - distanceB;
                 });
 
@@ -90,7 +90,7 @@
                 placeListView.innerHTML = '';
 
                 customMarkers.forEach(marker => {
-                    const distance = kakao.maps.services.DistanceMap.getDistance(map.getCenter(), marker.getPosition());
+                    const distance = kakao.maps.services.Distance.getDistance(map.getCenter(), marker.getPosition());
                     const listItem = document.createElement('li');
                     listItem.textContent = `거리: ${distance.toFixed(2)}m`;
                     placeListView.appendChild(listItem);
