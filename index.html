@@ -20,83 +20,88 @@
     </div>
 
     <script>
-        kakao.maps.load(() => {
-            let map;
-            let customMarkers = [];
+        function initMap() {
+            kakao.maps.load(() => {
+                let map;
+                let customMarkers = [];
 
-            const container = document.getElementById('map');
-            const options = {
-                center: new kakao.maps.LatLng(37.5665, 126.9780),
-                level: 13
-            };
+                const container = document.getElementById('map');
+                const options = {
+                    center: new kakao.maps.LatLng(37.5665, 126.9780),
+                    level: 13
+                };
 
-            map = new kakao.maps.Map(container, options);
+                map = new kakao.maps.Map(container, options);
 
-            const ps = new kakao.maps.services.Places();
-            const input = document.getElementById('searchInput');
+                const ps = new kakao.maps.services.Places();
+                const input = document.getElementById('searchInput');
 
-            function searchPlace() {
-                const keyword = input.value;
-                ps.keywordSearch(keyword, (data, status) => {
-                    if (status === kakao.maps.services.Status.OK) {
-                        const place = data[0];
-                        const coords = new kakao.maps.LatLng(place.y, place.x);
+                window.searchPlace = function() {
+                    const keyword = input.value;
+                    ps.keywordSearch(keyword, (data, status) => {
+                        if (status === kakao.maps.services.Status.OK) {
+                            const place = data[0];
+                            const coords = new kakao.maps.LatLng(place.y, place.x);
 
-                        map.panTo(coords);
+                            map.panTo(coords);
 
-                        const marker = new kakao.maps.Marker({
-                            position: coords
-                        });
+                            const marker = new kakao.maps.Marker({
+                                position: coords
+                            });
 
-                        map.markers && map.markers.forEach(marker => marker.setMap(null));
+                            map.markers && map.markers.forEach(marker => marker.setMap(null));
 
-                        marker.setMap(map);
-                        map.markers = [marker];
-                    }
-                });
-            }
+                            marker.setMap(map);
+                            map.markers = [marker];
+                        }
+                    });
+                };
 
-            function addCustomMarker(address) {
-                const geocoder = new kakao.maps.services.Geocoder();
-                geocoder.addressSearch(address, (result, status) => {
-                    if (status === kakao.maps.services.Status.OK) {
-                        const customCoords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                        const customMarker = new kakao.maps.Marker({
-                            position: customCoords
-                        });
+                window.addCustomMarker = function(address) {
+                    const geocoder = new kakao.maps.services.Geocoder();
+                    geocoder.addressSearch(address, (result, status) => {
+                        if (status === kakao.maps.services.Status.OK) {
+                            const customCoords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                            const customMarker = new kakao.maps.Marker({
+                                position: customCoords
+                            });
 
-                        customMarker.setMap(map);
-                        customMarkers.push(customMarker);
+                            customMarker.setMap(map);
+                            customMarkers.push(customMarker);
 
-                        sortByDistance();
-                    }
-                });
-            }
+                            sortByDistance();
+                        }
+                    });
+                };
 
-            function sortByDistance() {
-                const centerCoords = map.getCenter();
+                window.sortByDistance = function() {
+                    const centerCoords = map.getCenter();
 
-                customMarkers.sort((a, b) => {
-                    const distanceA = kakao.maps.services.Distance.getDistance(centerCoords, a.getPosition());
-                    const distanceB = kakao.maps.services.Distance.getDistance(centerCoords, b.getPosition());
-                    return distanceA - distanceB;
-                });
+                    customMarkers.sort((a, b) => {
+                        const distanceA = kakao.maps.services.Distance.getDistance(centerCoords, a.getPosition());
+                        const distanceB = kakao.maps.services.Distance.getDistance(centerCoords, b.getPosition());
+                        return distanceA - distanceB;
+                    });
 
-                updatePlaceList();
-            }
+                    updatePlaceList();
+                };
 
-            function updatePlaceList() {
-                const placeListView = document.getElementById('placeListView');
-                placeListView.innerHTML = '';
+                function updatePlaceList() {
+                    const placeListView = document.getElementById('placeListView');
+                    placeListView.innerHTML = '';
 
-                customMarkers.forEach(marker => {
-                    const distance = kakao.maps.services.Distance.getDistance(map.getCenter(), marker.getPosition());
-                    const listItem = document.createElement('li');
-                    listItem.textContent = `거리: ${distance.toFixed(2)}m`;
-                    placeListView.appendChild(listItem);
-                });
-            }
-        });
+                    customMarkers.forEach(marker => {
+                        const distance = kakao.maps.services.Distance.getDistance(map.getCenter(), marker.getPosition());
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `거리: ${distance.toFixed(2)}m`;
+                        placeListView.appendChild(listItem);
+                    });
+                }
+            });
+        }
+
+        // Kakao Maps API를 로드한 후 initMap 함수를 호출
+        kakao.maps.load(initMap);
     </script>
 </body>
 </html>
