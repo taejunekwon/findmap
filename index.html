@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kakao Map Example</title>
-    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey==204a7c5835adfe98d1f80dbb2054fab3&libraries=services,clusterer,drawing"></script>
+    <!-- 수정된 부분: = 두 개 사용 -->
+    <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=204a7c5835adfe98d1f80dbb2054fab3&libraries=services,clusterer,drawing"></script>
 </head>
 <body>
     <div id="map" style="width:100%;height:400px;"></div>
@@ -21,87 +22,87 @@
 
     <script>
         function initMap() {
-        let map;
-        let customMarkers = [];
+            let map;
+            let customMarkers = [];
 
-        const container = document.getElementById('map');
-        const options = {
-            center: new kakao.maps.LatLng(37.5665, 126.9780),
-            level: 13
-        };
+            const container = document.getElementById('map');
+            const options = {
+                center: new kakao.maps.LatLng(37.5665, 126.9780),
+                level: 13
+            };
 
-        map = new kakao.maps.Map(container, options);
+            map = new kakao.maps.Map(container, options);
 
-                const ps = new kakao.maps.services.Places(); // 수정된 부분
-                const input = document.getElementById('searchInput');
+            const ps = new kakao.maps.services.Places();
+            const input = document.getElementById('searchInput');
 
-                window.searchPlace = function() {
-                    const keyword = input.value;
-                    ps.keywordSearch(keyword, (data, status) => {
-                        if (status === kakao.maps.services.Status.OK) {
-                            const place = data[0];
-                            const coords = new kakao.maps.LatLng(place.y, place.x);
+            window.searchPlace = function() {
+                const keyword = input.value;
+                ps.keywordSearch(keyword, (data, status) => {
+                    if (status === kakao.maps.services.Status.OK) {
+                        const place = data[0];
+                        const coords = new kakao.maps.LatLng(place.y, place.x);
 
-                            map.panTo(coords);
+                        map.panTo(coords);
 
-                            const marker = new kakao.maps.Marker({
-                                position: coords
-                            });
+                        const marker = new kakao.maps.Marker({
+                            position: coords
+                        });
 
-                            map.markers && map.markers.forEach(marker => marker.setMap(null));
+                        map.markers && map.markers.forEach(marker => marker.setMap(null));
 
-                            marker.setMap(map);
-                            map.markers = [marker];
-                        }
-                    });
-                };
+                        marker.setMap(map);
+                        map.markers = [marker];
+                    }
+                });
+            };
 
-                window.addCustomMarker = function(address) {
-                    const geocoder = new kakao.maps.services.Geocoder();
-                    geocoder.addressSearch(address, (result, status) => {
-                        if (status === kakao.maps.services.Status.OK) {
-                            const customCoords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                            const customMarker = new kakao.maps.Marker({
-                                position: customCoords
-                            });
+            window.addCustomMarker = function(address) {
+                const geocoder = new kakao.maps.services.Geocoder();
+                geocoder.addressSearch(address, (result, status) => {
+                    if (status === kakao.maps.services.Status.OK) {
+                        const customCoords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                        const customMarker = new kakao.maps.Marker({
+                            position: customCoords
+                        });
 
-                            customMarker.setMap(map);
-                            customMarkers.push(customMarker);
+                        customMarker.setMap(map);
+                        customMarkers.push(customMarker);
 
-                            sortByDistance();
-                        }
-                    });
-                };
+                        sortByDistance();
+                    }
+                });
+            };
 
-                window.sortByDistance = function() {
-                    const centerCoords = map.getCenter();
+            window.sortByDistance = function() {
+                const centerCoords = map.getCenter();
 
-                    customMarkers.sort((a, b) => {
-                        const distanceA = kakao.maps.services.Distance.getDistance(centerCoords, a.getPosition());
-                        const distanceB = kakao.maps.services.Distance.getDistance(centerCoords, b.getPosition());
-                        return distanceA - distanceB;
-                    });
+                customMarkers.sort((a, b) => {
+                    const distanceA = kakao.maps.services.Distance.getDistance(centerCoords, a.getPosition());
+                    const distanceB = kakao.maps.services.Distance.getDistance(centerCoords, b.getPosition());
+                    return distanceA - distanceB;
+                });
 
-                    updatePlaceList();
-                };
+                updatePlaceList();
+            };
 
-                function updatePlaceList() {
-                    const placeListView = document.getElementById('placeListView');
-                    placeListView.innerHTML = '';
+            function updatePlaceList() {
+                const placeListView = document.getElementById('placeListView');
+                placeListView.innerHTML = '';
 
-                    customMarkers.forEach(marker => {
-                        const distance = kakao.maps.services.Distance.getDistance(map.getCenter(), marker.getPosition());
-                        const listItem = document.createElement('li');
-                        listItem.textContent = `거리: ${distance.toFixed(2)}m`;
-                        placeListView.appendChild(listItem);
-                    });
-                }
-            });
+                customMarkers.forEach(marker => {
+                    const distance = kakao.maps.services.Distance.getDistance(map.getCenter(), marker.getPosition());
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `거리: ${distance.toFixed(2)}m`;
+                    placeListView.appendChild(listItem);
+                });
+            }
         }
 
         // Kakao Maps API를 로드한 후 initMap 함수를 호출
         kakao.maps.load(() => {
-        initMap();
+            initMap();
+        });
     </script>
 </body>
 </html>
