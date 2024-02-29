@@ -81,26 +81,25 @@
                     }
                 });
             };
-        }
 
-        function updatePlaceList() {
-            const placeListView = document.getElementById('placeListView');
-            placeListView.innerHTML = '';
+            function updatePlaceList() {
+                placeListView.innerHTML = '';
 
-            // 가까운 순으로 정렬
-            customMarkers.sort((a, b) => {
-                const distanceA = kakao.maps.geometry.distance(map.getCenter(), a.getPosition());
-                const distanceB = kakao.maps.geometry.distance(map.getCenter(), b.getPosition());
-                return distanceA - distanceB;
-            });
+                // 가까운 순으로 정렬
+                customMarkers.sort((a, b) => {
+                    const distanceA = kakao.maps.geometry.distance(map.getCenter(), a.getPosition());
+                    const distanceB = kakao.maps.geometry.distance(map.getCenter(), b.getPosition());
+                    return distanceA - distanceB;
+                });
 
-            customMarkers.forEach(marker => {
-                const distance = kakao.maps.geometry.distance(map.getCenter(), marker.getPosition());
-                const listItem = document.createElement('li');
-                // 부여한 이름 및 주소 표시
-                listItem.textContent = `이름: ${marker.name}, 주소: ${marker.getPosition()} (거리: ${distance.toFixed(2)}m)`;
-                placeListView.appendChild(listItem);
-            });
+                customMarkers.forEach(marker => {
+                    const distance = kakao.maps.geometry.distance(map.getCenter(), marker.getPosition());
+                    const listItem = document.createElement('li');
+                    // 부여한 이름 및 주소 표시
+                    listItem.textContent = `이름: ${marker.name}, 주소: ${marker.getPosition()} (거리: ${distance.toFixed(2)}m)`;
+                    placeListView.appendChild(listItem);
+                });
+            }
         }
 
         // Kakao Maps API를 로드한 후 initMap 함수를 호출
