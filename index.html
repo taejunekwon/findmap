@@ -47,8 +47,9 @@
                             map: map,
                         });
 
-                        // 사용자가 부여한 이름 추가
+                        // 사용자가 부여한 이름과 주소 추가
                         customMarker.name = name;
+                        customMarker.address = result[0].address_name;
 
                         customMarkers.push(customMarker);
                         updatePlaceList();
@@ -97,7 +98,7 @@
                     const distance = getDistance(map.getCenter(), marker.getPosition());
                     const listItem = document.createElement('li');
                     // 부여한 이름 및 주소 표시
-                    listItem.textContent = `이름: ${marker.name}, 주소: ${marker.getPosition()} (거리: ${distance.toFixed(2)}m)`;
+                    listItem.textContent = `이름: ${marker.name}, 주소: ${marker.address} (거리: ${distance.toFixed(2)}m)`;
                     placeListView.appendChild(listItem);
                 });
             }
