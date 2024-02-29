@@ -9,6 +9,7 @@
 <body>
     <div id="map" style="width:100%;height:400px;"></div>
     <input type="text" id="searchInput" placeholder="장소를 검색하세요">
+    <button onclick="searchPlace()">검색</button>
     <ul id="placeListView"></ul>
 
     <script>
@@ -27,7 +28,7 @@
 
             // 사용자가 직접 입력한 장소 목록
             const locations = [
-                { name: '장소1', address: '주소1' },
+                { name: '티스테이션 도림점', address: '서울 영등포구 도림로 342' },
                 { name: '장소2', address: '주소2' },
                 // 추가적으로 필요한 만큼 계속 추가
             ];
