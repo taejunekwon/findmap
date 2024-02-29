@@ -13,6 +13,18 @@
     <ul id="placeListView"></ul>
 
     <script>
+        function haversine(lat1, lon1, lat2, lon2) {
+            const R = 6371; // 지구의 반지름 (단위: km)
+            const dLat = (lat2 - lat1) * (Math.PI / 180);
+            const dLon = (lon2 - lon1) * (Math.PI / 180);
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            const distance = R * c; // 거리 (단위: km)
+            return distance;
+        }
+
         function initMap() {
             let map;
             let customMarkers = [];
@@ -89,24 +101,10 @@
 
             // 가까운 순으로 정렬
             customMarkers.sort((a, b) => {
-                const distanceA = kakao.maps.services.Distance.getDistance(map.getCenter(), a.getPosition());
-                const distanceB = kakao.maps.services.Distance.getDistance(map.getCenter(), b.getPosition());
+                const distanceA = haversine(map.getCenter().getLat(), map.getCenter().getLng(), a.getPosition().getLat(), a.getPosition().getLng());
+                const distanceB = haversine(map.getCenter().getLat(), map.getCenter().getLng(), b.getPosition().getLat(), b.getPosition().getLng());
                 return distanceA - distanceB;
             });
 
             customMarkers.forEach(marker => {
-                const distance = kakao.maps.services.Distance.getDistance(map.getCenter(), marker.getPosition());
-                const listItem = document.createElement('li');
-                // 부여한 이름 및 주소 표시
-                listItem.textContent = `이름: ${marker.name}, 주소: ${marker.getPosition()} (거리: ${distance.toFixed(2)}m)`;
-                placeListView.appendChild(listItem);
-            });
-        }
-
-        // Kakao Maps API를 로드한 후 initMap 함수를 호출
-        kakao.maps.load(() => {
-            initMap();
-        });
-    </script>
-</body>
-</html>
+                const distance = havers
