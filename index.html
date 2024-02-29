@@ -21,17 +21,16 @@
 
     <script>
         function initMap() {
-            kakao.maps.load(() => {
-                let map;
-                let customMarkers = [];
+        let map;
+        let customMarkers = [];
 
-                const container = document.getElementById('map');
-                const options = {
-                    center: new kakao.maps.LatLng(37.5665, 126.9780),
-                    level: 13
-                };
+        const container = document.getElementById('map');
+        const options = {
+            center: new kakao.maps.LatLng(37.5665, 126.9780),
+            level: 13
+        };
 
-                map = new kakao.maps.Map(container, options);
+        map = new kakao.maps.Map(container, options);
 
                 const ps = new kakao.maps.services.Places(); // 수정된 부분
                 const input = document.getElementById('searchInput');
@@ -101,7 +100,8 @@
         }
 
         // Kakao Maps API를 로드한 후 initMap 함수를 호출
-        kakao.maps.load(initMap);
+        kakao.maps.load(() => {
+        initMap();
     </script>
 </body>
 </html>
