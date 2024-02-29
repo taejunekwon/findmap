@@ -15,7 +15,7 @@
     <script>
         function initMap() {
             let map;
-            let customMarkers = []; // customMarkers를 여기서 정의
+            let customMarkers = [];
             const placeListView = document.getElementById('placeListView');
 
             const container = document.getElementById('map');
@@ -25,6 +25,37 @@
             };
 
             map = new kakao.maps.Map(container, options);
+
+            // 사용자가 직접 입력한 장소 목록
+            const locations = [
+                { name: '티스테이션 도림점', address: '서울 영등포구 도림로 342' },
+                { name: '장소2', address: '주소2' },
+                // 추가적으로 필요한 만큼 계속 추가
+            ];
+
+            locations.forEach(location => {
+                const address = location.address;
+                const name = location.name;
+
+                // 주소로부터 좌표 얻어오기
+                const geocoder = new kakao.maps.services.Geocoder();
+                geocoder.addressSearch(address, (result, status) => {
+                    if (status === kakao.maps.services.Status.OK) {
+                        const customCoords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                        const customMarker = new kakao.maps.Marker({
+                            position: customCoords,
+                            map: map,
+                        });
+
+                        // 사용자가 부여한 이름 추가
+                        customMarker.name = name;
+
+                        customMarkers.push(customMarker);
+                        updatePlaceList();
+                    }
+                });
+            });
+
             const input = document.getElementById('searchInput');
 
             window.searchPlace = function() {
@@ -57,13 +88,13 @@
 
                 // 가까운 순으로 정렬
                 customMarkers.sort((a, b) => {
-                    const distanceA = kakao.maps.services.Distance.getDistance(map.getCenter(), a.getPosition());
-                    const distanceB = kakao.maps.services.Distance.getDistance(map.getCenter(), b.getPosition());
+                    const distanceA = getDistance(map.getCenter(), a.getPosition());
+                    const distanceB = getDistance(map.getCenter(), b.getPosition());
                     return distanceA - distanceB;
                 });
 
                 customMarkers.forEach(marker => {
-                    const distance = kakao.maps.services.Distance.getDistance(map.getCenter(), marker.getPosition());
+                    const distance = getDistance(map.getCenter(), marker.getPosition());
                     const listItem = document.createElement('li');
                     // 부여한 이름 및 주소 표시
                     listItem.textContent = `이름: ${marker.name}, 주소: ${marker.getPosition()} (거리: ${distance.toFixed(2)}m)`;
@@ -71,35 +102,14 @@
                 });
             }
 
-            // 사용자가 직접 입력한 장소 목록
-            const locations = [
-                { name: '티스테이션 도림점', address: '서울 영등포구 도림로 342' },
-                { name: '장소2', address: '주소2' },
-                // 추가적으로 필요한 만큼 계속 추가
-            ];
-
-            locations.forEach(location => {
-                const address = location.address;
-                const name = location.name;
-
-                // 주소로부터 좌표 얻어오기
-                const geocoder = new kakao.maps.services.Geocoder();
-                geocoder.addressSearch(address, (result, status) => {
-                    if (status === kakao.maps.services.Status.OK) {
-                        const customCoords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                        const customMarker = new kakao.maps.Marker({
-                            position: customCoords,
-                            map: map,
-                        });
-
-                        // 사용자가 부여한 이름 추가
-                        customMarker.name = name;
-
-                        customMarkers.push(customMarker);
-                        updatePlaceList();
-                    }
+            // 두 지점 간의 거리를 계산하는 함수
+            function getDistance(latlng1, latlng2) {
+                const polyline = new kakao.maps.Polyline({
+                    path: [latlng1, latlng2],
                 });
-            });
+
+                return polyline.getLength();
+            }
         }
 
         // Kakao Maps API를 로드한 후 initMap 함수를 호출
