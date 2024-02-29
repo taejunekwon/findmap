@@ -15,9 +15,10 @@
     <ul id="placeListView"></ul>
 
     <script>
+        let customMarkers = [];
+
         function initMap() {
             let map;
-            let customMarkers = [];
             const placeListView = document.getElementById('placeListView');
 
             const container = document.getElementById('map');
