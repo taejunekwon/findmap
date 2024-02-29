@@ -1,13 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kakao Map Example</title>
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=204a7c5835adfe98d1f80dbb2054fab3&libraries=services,clusterer,drawing"></script>
 </head>
-
 <body>
     <div id="map" style="width:100%;height:400px;"></div>
     <input type="text" id="searchInput" placeholder="장소를 검색하세요">
@@ -15,12 +13,11 @@
     <ul id="placeListView"></ul>
 
     <script>
+        let map;
         let customMarkers = [];
+        const placeListView = document.getElementById('placeListView');
 
         function initMap() {
-            let map;
-            const placeListView = document.getElementById('placeListView');
-
             const container = document.getElementById('map');
             const options = {
                 center: new kakao.maps.LatLng(37.5665, 126.9780),
@@ -58,45 +55,44 @@
                     }
                 });
             });
-
-            const input = document.getElementById('searchInput');
-
-            window.searchPlace = function () {
-                const keyword = input.value;
-                const ps = new kakao.maps.services.Places();
-
-                ps.keywordSearch(keyword, (data, status) => {
-                    if (status === kakao.maps.services.Status.OK) {
-                        const place = data[0];
-                        const coords = new kakao.maps.LatLng(place.y, place.x);
-
-                        map.panTo(coords);
-
-                        const marker = new kakao.maps.Marker({
-                            position: coords
-                        });
-
-                        map.markers && map.markers.forEach(marker => marker.setMap(null));
-
-                        marker.setMap(map);
-                        map.markers = [marker];
-                        updatePlaceList();
-                    }
-                });
-            };
         }
 
+        window.searchPlace = function() {
+            const input = document.getElementById('searchInput');
+            const keyword = input.value;
+            const ps = new kakao.maps.services.Places();
+
+            ps.keywordSearch(keyword, (data, status) => {
+                if (status === kakao.maps.services.Status.OK) {
+                    const place = data[0];
+                    const coords = new kakao.maps.LatLng(place.y, place.x);
+
+                    map.panTo(coords);
+
+                    const marker = new kakao.maps.Marker({
+                        position: coords
+                    });
+
+                    map.markers && map.markers.forEach(marker => marker.setMap(null));
+
+                    marker.setMap(map);
+                    map.markers = [marker];
+                    updatePlaceList();
+                }
+            });
+        };
+
         function updatePlaceList() {
-            const placeListView = document.getElementById('placeListView');
             placeListView.innerHTML = '';
 
             // 가까운 순으로 정렬
             customMarkers.sort((a, b) => {
-                const distanceA = kakao.maps.geometry.distance(
+                const distanceA = kakao.maps.services.Distance.getDistance(
                     new kakao.maps.LatLng(map.getCenter().getLat(), map.getCenter().getLng()),
                     a.getPosition()
                 );
-                const distanceB = kakao.maps.geometry.distance(
+
+                const distanceB = kakao.maps.services.Distance.getDistance(
                     new kakao.maps.LatLng(map.getCenter().getLat(), map.getCenter().getLng()),
                     b.getPosition()
                 );
@@ -105,10 +101,11 @@
             });
 
             customMarkers.forEach(marker => {
-                const distance = kakao.maps.geometry.distance(
+                const distance = kakao.maps.services.Distance.getDistance(
                     new kakao.maps.LatLng(map.getCenter().getLat(), map.getCenter().getLng()),
                     marker.getPosition()
                 );
+
                 const listItem = document.createElement('li');
                 // 부여한 이름 및 주소 표시
                 listItem.textContent = `이름: ${marker.name}, 주소: ${marker.getPosition()} (거리: ${distance.toFixed(2)}m)`;
@@ -122,5 +119,4 @@
         });
     </script>
 </body>
-
 </html>
