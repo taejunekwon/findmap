@@ -1,13 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-<head> 가까운 공업사찾기
+<head> <p>가까운 공업사 찾기: 20px</p>
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>양파 공업사 찾기 페이지</title>
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=204a7c5835adfe98d1f80dbb2054fab3&libraries=services,clusterer,drawing"></script>
 </head>
 <body>
-    <div id="map" style="width:50%;height:350px;"></div>
+    <div id="map" style="width:35%;height:350px;"></div>  <p style="color:red"></p>"해당 거리는 직선 거리 기준이므로 업무의 참고 부탁드립니다."</p>
     <input type="text" id="searchInput" placeholder="장소를 검색하세요">
     <button onclick="searchPlace()">검색</button>
     <ul id="placeListView"></ul>
