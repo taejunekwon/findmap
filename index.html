@@ -7,7 +7,7 @@
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=204a7c5835adfe98d1f80dbb2054fab3&libraries=services,clusterer,drawing"></script>
 </head>
 <body>
-    <div id="map" style="width:70%;height:350px;"></div>
+    <div id="map" style="width:50%;height:350px;"></div>
     <input type="text" id="searchInput" placeholder="장소를 검색하세요">
     <button onclick="searchPlace()">검색</button>
     <ul id="placeListView"></ul>
@@ -26,9 +26,8 @@
 
             map = new kakao.maps.Map(container, options);
 
-            // 사용자가 직접 입력한 장소 목록
+            
             const locations = [
-                { name: '티스테이션 도림점', address: '서울 영등포구 도림로 342' },
                 { name: '한국타이어 영동판매', address: '강원도 강릉시 강릉대로 320' },
                 { name: '마스터자동차 춘천석사2호점(한양카센타)', address: '강원 춘천시 공지로 208' },
                 { name: '	한국타이어 영동판매	 ', address: '	강원도 강릉시 강릉대로 320	 ' } ,
@@ -94,14 +93,13 @@
 { name: '	제주공항존 부속차고지	 ', address: '	제주특별자치도 제주시 도두일동 2276-2 *반드시 연락처로 연락 후 입고 	 ' } ,
 { name: '	대원상사	 ', address: '	제주특별자치도 제주시 거로중길 57-13/(연락후 입고가능)	 ' } ,
 
-                // 추가적으로 필요한 만큼 계속 추가
+                
             ];
 
             locations.forEach(location => {
                 const address = location.address;
                 const name = location.name;
 
-                // 주소로부터 좌표 얻어오기
                 const geocoder = new kakao.maps.services.Geocoder();
                 geocoder.addressSearch(address, (result, status) => {
                     if (status === kakao.maps.services.Status.OK) {
@@ -111,7 +109,6 @@
                             map: map,
                         });
 
-                        // 사용자가 부여한 이름과 주소 추가
                         customMarker.name = name;
                         customMarker.address = result[0].address_name;
 
@@ -151,23 +148,23 @@
                 const placeListView = document.getElementById('placeListView');
                 placeListView.innerHTML = '';
 
-                // 가까운 순으로 정렬
                 customMarkers.sort((a, b) => {
                     const distanceA = getDistance(map.getCenter(), a.getPosition());
                     const distanceB = getDistance(map.getCenter(), b.getPosition());
                     return distanceA - distanceB;
                 });
 
-                customMarkers.forEach(marker => {
+                const top5Markers = customMarkers.slice(0, 5);
+
+                top5Markers.forEach(marker => {
                     const distance = getDistance(map.getCenter(), marker.getPosition());
                     const listItem = document.createElement('li');
-                    // 부여한 이름 및 주소 표시
+                    
                     listItem.textContent = `이름: ${marker.name}, 주소: ${marker.address} (거리: ${distance.toFixed(2)}m)`;
                     placeListView.appendChild(listItem);
                 });
             }
 
-            // 두 지점 간의 거리를 계산하는 함수
             function getDistance(latlng1, latlng2) {
                 const polyline = new kakao.maps.Polyline({
                     path: [latlng1, latlng2],
@@ -177,7 +174,6 @@
             }
         }
 
-        // Kakao Maps API를 로드한 후 initMap 함수를 호출
         kakao.maps.load(() => {
             initMap();
         });
