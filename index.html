@@ -225,7 +225,7 @@
                 polyline.setMap(map);
 
                 const content =
-                    "이동 거리: " + distance + "m, 소요 시간: " + duration + "분";
+                    "이동 거리: " + (distance / 1000).toFixed(2) + "km, 소요 시간: " + duration + "분";
                 const infowindow = new kakao.maps.InfoWindow({
                     content: content,
                     zIndex: 1,
@@ -253,9 +253,9 @@ function updatePlaceList() {
         const distance = getDistance(map.getCenter(), marker.getPosition());
 
         const listItem = document.createElement("li");
-        listItem.textContent = `이름: ${marker.name}, 주소: ${marker.address} (거리: ${distance.toFixed(
+        listItem.textContent = `이름: ${marker.name}, 주소: ${marker.address} (거리: ${(distance / 1000).toFixed(
             2
-        )}m)`;
+        )}km)`;
         listItem.addEventListener("click", () => {
             calculateAndDisplayRoute(marker.getPosition());
         });
@@ -263,6 +263,7 @@ function updatePlaceList() {
         placeListView.appendChild(listItem);
     });
 }
+
 
             function displayMarkerInfo(marker) {
                 const infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
