@@ -1,17 +1,54 @@
 <!DOCTYPE html>
 <html lang="en">
-<head> <font size=5>가까운 공업사 찾기: 22px</font></br>
-<head> <font size=5>가까운 공업사 찾기</font></br>
-
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>양파 공업사 찾기 페이지</title>
+    <style>
+        /* 헤더 스타일 */
+        header {
+            background-color: #333; 
+            color: #fff; 
+            padding: 10px; 
+            font-size: 24px; 
+            font-weight: bold; 
+            text-align: left;
+        }
+
+        /* 지도 스타일 */
+        #map {
+            width: 35%;
+            height: 350px;
+        }
+
+        /* 리스트 스타일 */
+        #placeListView {
+            list-style: none; 
+            padding: 10px; 
+            background-color: #f5f5f5; 
+        }
+
+        /* 마지막 줄 스타일 */
+        footer {
+            background-color: #333; 
+            color: #fff; 
+            text-align: left;
+            padding: 5px; 
+            font-size: 24px; 
+            font-weight: bold; 
+        }
+    </style>
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=204a7c5835adfe98d1f80dbb2054fab3&libraries=services,clusterer,drawing"></script>
 </head>
 <body>
-    <div id="map" style="width:35%;height:350px;"></div>  <font color="red">해당 거리는 직선 거리 기준이므로 업무의 참고 부탁드립니다.</font></br>
+    <!-- 헤더 추가 -->
+    <header>가까운 공업사 찾기</header>
+
+    <div id="map"></div>
+    <font color="red">해당 거리는 직선 거리 기준이므로 업무의 참고 부탁드립니다.</font></br>
     <input type="text" id="searchInput" placeholder="장소를 검색하세요">
     <button onclick="searchPlace()">검색</button>
+    <!-- 리스트 뷰에 ID 추가 -->
     <ul id="placeListView"></ul>
     <script>
         function initMap() {
@@ -168,10 +205,7 @@
                     placeListView.appendChild(listItem);
                 });
 
-                // 전체 거리 합 출력
-                const totalListItem = document.createElement('li');
-                totalListItem.textContent = `전체 거리 합: ${totalDistance.toFixed(2)}m`;
-                placeListView.appendChild(totalListItem);
+               
             }
 
             function displayMarkerInfo(marker) {
@@ -196,5 +230,6 @@
             initMap();
         });
     </script>
+    <footer>제작자: 양파</footer>
 </body>
 </html>
