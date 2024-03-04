@@ -79,7 +79,6 @@
                 level: 4
             };
             map = new kakao.maps.Map(container, options);
-            const ps = new kakao.maps.services.Places();
             
             const locations = [
                 { name: '한국타이어 영동판매', address: '강원도 강릉시 강릉대로 320' },
@@ -149,128 +148,109 @@
                 
             ];
             locations.forEach(location => {
-            const address = location.address;
-            const name = location.name;
+                const address = location.address;
+                const name = location.name;
 
-            const geocoder = new kakao.maps.services.Geocoder();
-            geocoder.addressSearch(address, (result, status) => {
-                if (status === kakao.maps.services.Status.OK) {
-                    const customCoords = new kakao.maps.LatLng(result[0].y, result[0].x);
-                    const customMarker = new kakao.maps.Marker({
-                        position: customCoords,
-                        map: map,
-                    });
+                const geocoder = new kakao.maps.services.Geocoder();
+                geocoder.addressSearch(address, (result, status) => {
+                    if (status === kakao.maps.services.Status.OK) {
+                        const customCoords = new kakao.maps.LatLng(result[0].y, result[0].x);
+                        const customMarker = new kakao.maps.Marker({
+                            position: customCoords,
+                            map: map,
+                        });
 
-                    customMarker.name = name;
-                    customMarker.address = result[0].address_name;
+                        customMarker.name = name;
+                        customMarker.address = result[0].address_name;
 
-                    // 마커에 마우스 이벤트 추가
-                    kakao.maps.event.addListener(customMarker, 'mouseover', function () {
-                        displayMarkerInfo(customMarker);
-                    });
+                        // 마커에 마우스 이벤트 추가
+                        kakao.maps.event.addListener(customMarker, 'mouseover', function() {
+                            displayMarkerInfo(customMarker);
+                        });
 
-                    customMarkers.push(customMarker);
-                    updatePlaceList();
-                }
-            });
-        });
-
-        const input = document.getElementById('searchInput');
-
-        window.searchPlace = function () {
-            const keyword = input.value;
-            ps.keywordSearch(keyword, (data, status) => {
-                if (status === kakao.maps.services.Status.OK) {
-                    const place = data[0];
-                    const coords = new kakao.maps.LatLng(place.y, place.x);
-
-                    map.panTo(coords);
-
-                    const marker = new kakao.maps.Marker({
-                        position: coords
-                    });
-
-                    map.markers && map.markers.forEach(marker => marker.setMap(null));
-
-                    marker.setMap(map);
-                    map.markers = [marker];
-                    updatePlaceList();
-                }
-            });
-        };
-
-        function updatePlaceList() {
-            placeListView.innerHTML = '';
-
-            customMarkers.sort((a, b) => {
-                const distanceA = getDistance(map.getCenter(), a.getPosition());
-                const distanceB = getDistance(map.getCenter(), b.getPosition());
-                return distanceA - distanceB;
+                        customMarkers.push(customMarker);
+                        updatePlaceList();
+                    }
+                });
             });
 
-            const top5Markers = customMarkers.slice(0, 5);
+            const input = document.getElementById('searchInput');
 
-            top5Markers.forEach(marker => {
-                // 변경된 부분: calculateAndDisplayRoute 호출 대신 displayRouteInfo 호출
-                const listItem = document.createElement('li');
-                listItem.textContent = `이름: ${marker.name}, 주소: ${marker.address}`;
-                listItem.addEventListener('click', () => {
-                    displayRouteInfo(marker);
+            window.searchPlace = function() {
+                const keyword = input.value;
+                const ps = new kakao.maps.services.Places();
+
+                ps.keywordSearch(keyword, (data, status) => {
+                    if (status === kakao.maps.services.Status.OK) {
+                        const place = data[0];
+                        const coords = new kakao.maps.LatLng(place.y, place.x);
+
+                        map.panTo(coords);
+
+                        const marker = new kakao.maps.Marker({
+                            position: coords
+                        });
+
+                        map.markers && map.markers.forEach(marker => marker.setMap(null));
+
+                        marker.setMap(map);
+                        map.markers = [marker];
+                        updatePlaceList();
+                    }
+                });
+            };
+
+            function updatePlaceList() {
+                const placeListView = document.getElementById('placeListView');
+                placeListView.innerHTML = '';
+
+                customMarkers.sort((a, b) => {
+                    const distanceA = getDistance(map.getCenter(), a.getPosition());
+                    const distanceB = getDistance(map.getCenter(), b.getPosition());
+                    return distanceA - distanceB;
                 });
 
-                placeListView.appendChild(listItem);
-            });
-        }
+                const top5Markers = customMarkers.slice(0, 5);
+    let totalDistance = 0;
 
-        function displayMarkerInfo(marker) {
-            const infowindow = new kakao.maps.InfoWindow({zIndex: 1});
+    top5Markers.forEach(marker => {
+        const distance = getDistance(map.getCenter(), marker.getPosition()) / 1000; 
+        totalDistance += distance;
 
-            const content = `<div style="padding:5px;">${marker.name}</div>`;
-
-            infowindow.setContent(content);
-            infowindow.open(map, marker);
-        }
-
-        function getDistance(latlng1, latlng2) {
-            const polyline = new kakao.maps.Polyline({
-                path: [latlng1, latlng2],
-            });
-
-            return polyline.getLength();
-        }
-
-        function displayRouteInfo(destination) {
-            const start = map.getCenter();
-
-            ps.categorySearch('TA', (data, status) => {
-                if (status === kakao.maps.services.Status.OK) {
-                    const options = {
-                        startLoc: start,
-                        endLoc: destination.getPosition(),
-                        path: data,
-                    };
-
-                    const distanceService = new kakao.maps.services.Distance();
-                    distanceService.getDistance(options, (result, status) => {
-                        if (status === kakao.maps.services.Status.OK) {
-                            const listItem = document.createElement('li');
-                            listItem.textContent = `이름: ${destination.name}, 주소: ${destination.address} (거리: ${result.distance}m)`;
-
-                            placeListView.appendChild(listItem);
-                        }
-                    });
-                }
-            });
-        }
-    }
-
-    kakao.maps.load(() => {
-        initMap();
+        const listItem = document.createElement('li');
+        listItem.textContent = `이름: ${marker.name}, 주소: ${marker.address} (거리: ${distance.toFixed(2)}km)`;
+        placeListView.appendChild(listItem);
     });
-</script>
 
-<!-- 푸터 추가 -->
-<footer>제작자: 양파</footer>
+               
+            }
+
+            function displayMarkerInfo(marker) {
+                const infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
+
+                const content = `<div style="padding:5px;">${marker.name}</div>`;
+
+                infowindow.setContent(content);
+                infowindow.open(map, marker);
+            }
+
+            function getDistance(latlng1, latlng2) {
+                const polyline = new kakao.maps.Polyline({
+                    path: [latlng1, latlng2],
+                });
+
+                return polyline.getLength();
+            }
+        }
+
+        kakao.maps.load(() => {
+            initMap();
+        });
+    </script>
+
+    <!-- 푸터 추가 -->
+    <footer>제작자: 양파</footer>
 
 </body>
+
 </html>
