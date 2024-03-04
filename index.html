@@ -200,41 +200,47 @@
             };
 
             function calculateAndDisplayRoute(destination) {
-    const directionsService = new kakao.maps.services.Directions();
-    const start = map.getCenter();
+    const ps = new kakao.maps.services.Places();
 
-    directionsService.route(
-        {
-            origin: start,
-            destination: destination,
-            travelMode: kakao.maps.services.TravelMode.WALKING,
-        },
-        function (result, status) {
-            if (status === kakao.maps.services.Status.OK) {
-                const distance = result.routes[0].distance;
-                const duration = result.routes[0].duration;
+    ps.categorySearch('TA', (data, status) => {
+        if (status === kakao.maps.services.Status.OK) {
+            const start = map.getCenter();
+            const end = destination;
 
-                const polyline = new kakao.maps.Polyline({
-                    path: result.routes[0].section[0].polyline,
-                    strokeWeight: 3,
-                    strokeColor: "#FF0000",
-                    strokeOpacity: 0.7,
-                    strokeStyle: "solid",
-                });
+            const options = {
+                startLoc: start,
+                endLoc: end,
+                path: data,
+            };
 
-                polyline.setMap(map);
+            const distanceService = new kakao.maps.services.Distance();
+            distanceService.getDistance(options, (result, status) => {
+                if (status === kakao.maps.services.Status.OK) {
+                    const distance = result.distance;
+                    const duration = result.duration;
 
-                const content =
-                    "이동 거리: " + (distance / 1000).toFixed(2) + "km, 소요 시간: " + duration + "분";
-                const infowindow = new kakao.maps.InfoWindow({
-                    content: content,
-                    zIndex: 1,
-                });
+                    const polyline = new kakao.maps.Polyline({
+                        path: result.path,
+                        strokeWeight: 3,
+                        strokeColor: "#FF0000",
+                        strokeOpacity: 0.7,
+                        strokeStyle: "solid",
+                    });
 
-                infowindow.open(map, map.markers[0]);
-            }
+                    polyline.setMap(map);
+
+                    const content =
+                        "이동 거리: " + (distance / 1000).toFixed(2) + "km, 소요 시간: " + duration + "분";
+                    const infowindow = new kakao.maps.InfoWindow({
+                        content: content,
+                        zIndex: 1,
+                    });
+
+                    infowindow.open(map, map.markers[0]);
+                }
+            });
         }
-    );
+    });
 }
 
 function updatePlaceList() {
@@ -250,12 +256,8 @@ function updatePlaceList() {
     const top5Markers = customMarkers.slice(0, 5);
 
     top5Markers.forEach((marker, index) => {
-        const distance = getDistance(map.getCenter(), marker.getPosition());
-
         const listItem = document.createElement("li");
-        listItem.textContent = `이름: ${marker.name}, 주소: ${marker.address} (거리: ${(distance / 1000).toFixed(
-            2
-        )}km)`;
+        listItem.textContent = `이름: ${marker.name}, 주소: ${marker.address}`;
         listItem.addEventListener("click", () => {
             calculateAndDisplayRoute(marker.getPosition());
         });
@@ -263,6 +265,7 @@ function updatePlaceList() {
         placeListView.appendChild(listItem);
     });
 }
+
 
 
             function displayMarkerInfo(marker) {
