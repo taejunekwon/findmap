@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+<head> <font size=5>가까운 공업사 찾기: 22px</font></br>
 <head> <font size=5>가까운 공업사 찾기</font></br>
 
     <meta charset="UTF-8">
@@ -12,21 +13,17 @@
     <input type="text" id="searchInput" placeholder="장소를 검색하세요">
     <button onclick="searchPlace()">검색</button>
     <ul id="placeListView"></ul>
-
     <script>
         function initMap() {
             let map;
             let customMarkers = [];
             const placeListView = document.getElementById('placeListView');
-
             const container = document.getElementById('map');
             const options = {
                 center: new kakao.maps.LatLng(37.5665, 126.9780),
                 level: 4
             };
-
             map = new kakao.maps.Map(container, options);
-
             
             const locations = [
                 { name: '한국타이어 영동판매', address: '강원도 강릉시 강릉대로 320' },
@@ -93,10 +90,8 @@
 { name: '	티스테이션 김해점	 ', address: '	경남 김해시 가야로 506	 ' } ,
 { name: '	제주공항존 부속차고지	 ', address: '	제주특별자치도 제주시 도두일동 2276-2 *반드시 연락처로 연락 후 입고 	 ' } ,
 { name: '	대원상사	 ', address: '	제주특별자치도 제주시 거로중길 57-13/(연락후 입고가능)	 ' } ,
-
                 
             ];
-
             locations.forEach(location => {
                 const address = location.address;
                 const name = location.name;
@@ -112,6 +107,11 @@
 
                         customMarker.name = name;
                         customMarker.address = result[0].address_name;
+
+                        // 마커에 마우스 이벤트 추가
+                        kakao.maps.event.addListener(customMarker, 'mouseover', function() {
+                            displayMarkerInfo(customMarker);
+                        });
 
                         customMarkers.push(customMarker);
                         updatePlaceList();
@@ -156,14 +156,31 @@
                 });
 
                 const top5Markers = customMarkers.slice(0, 5);
+                let totalDistance = 0;
 
                 top5Markers.forEach(marker => {
                     const distance = getDistance(map.getCenter(), marker.getPosition());
+                    totalDistance += distance;
+
                     const listItem = document.createElement('li');
-                    
+
                     listItem.textContent = `이름: ${marker.name}, 주소: ${marker.address} (거리: ${distance.toFixed(2)}m)`;
                     placeListView.appendChild(listItem);
                 });
+
+                // 전체 거리 합 출력
+                const totalListItem = document.createElement('li');
+                totalListItem.textContent = `전체 거리 합: ${totalDistance.toFixed(2)}m`;
+                placeListView.appendChild(totalListItem);
+            }
+
+            function displayMarkerInfo(marker) {
+                const infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
+
+                const content = `<div style="padding:5px;">${marker.name}</div>`;
+
+                infowindow.setContent(content);
+                infowindow.open(map, marker);
             }
 
             function getDistance(latlng1, latlng2) {
