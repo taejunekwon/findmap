@@ -79,6 +79,7 @@
                 level: 4
             };
             map = new kakao.maps.Map(container, options);
+            const ps = new kakao.maps.services.Places();
             
             const locations = [
                 { name: '한국타이어 영동판매', address: '강원도 강릉시 강릉대로 320' },
