@@ -199,31 +199,70 @@
                 });
             };
 
-            function updatePlaceList() {
-                const placeListView = document.getElementById('placeListView');
-                placeListView.innerHTML = '';
+            function calculateAndDisplayRoute(destination) {
+    const directionsService = new kakao.maps.services.Directions();
+    const start = map.getCenter();
 
-                customMarkers.sort((a, b) => {
-                    const distanceA = getDistance(map.getCenter(), a.getPosition());
-                    const distanceB = getDistance(map.getCenter(), b.getPosition());
-                    return distanceA - distanceB;
+    directionsService.route(
+        {
+            origin: start,
+            destination: destination,
+            travelMode: kakao.maps.services.TravelMode.WALKING,
+        },
+        function (result, status) {
+            if (status === kakao.maps.services.Status.OK) {
+                const distance = result.routes[0].distance;
+                const duration = result.routes[0].duration;
+
+                const polyline = new kakao.maps.Polyline({
+                    path: result.routes[0].section[0].polyline,
+                    strokeWeight: 3,
+                    strokeColor: "#FF0000",
+                    strokeOpacity: 0.7,
+                    strokeStyle: "solid",
                 });
 
-                const top5Markers = customMarkers.slice(0, 5);
-                let totalDistance = 0;
+                polyline.setMap(map);
 
-                top5Markers.forEach(marker => {
-                    const distance = getDistance(map.getCenter(), marker.getPosition());
-                    totalDistance += distance;
-
-                    const listItem = document.createElement('li');
-
-                    listItem.textContent = `이름: ${marker.name}, 주소: ${marker.address} (거리: ${distance.toFixed(2)}m)`;
-                    placeListView.appendChild(listItem);
+                const content =
+                    "이동 거리: " + distance + "m, 소요 시간: " + duration + "분";
+                const infowindow = new kakao.maps.InfoWindow({
+                    content: content,
+                    zIndex: 1,
                 });
 
-               
+                infowindow.open(map, map.markers[0]);
             }
+        }
+    );
+}
+
+function updatePlaceList() {
+    const placeListView = document.getElementById("placeListView");
+    placeListView.innerHTML = "";
+
+    customMarkers.sort((a, b) => {
+        const distanceA = getDistance(map.getCenter(), a.getPosition());
+        const distanceB = getDistance(map.getCenter(), b.getPosition());
+        return distanceA - distanceB;
+    });
+
+    const top5Markers = customMarkers.slice(0, 5);
+
+    top5Markers.forEach((marker, index) => {
+        const distance = getDistance(map.getCenter(), marker.getPosition());
+
+        const listItem = document.createElement("li");
+        listItem.textContent = `이름: ${marker.name}, 주소: ${marker.address} (거리: ${distance.toFixed(
+            2
+        )}m)`;
+        listItem.addEventListener("click", () => {
+            calculateAndDisplayRoute(marker.getPosition());
+        });
+
+        placeListView.appendChild(listItem);
+    });
+}
 
             function displayMarkerInfo(marker) {
                 const infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
