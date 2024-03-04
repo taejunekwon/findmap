@@ -195,36 +195,36 @@
                 const top5Markers = customMarkers.slice(0, 5);
                 let totalDistance = 0;
 
-                top5Markers.forEach(marker => {
+                // 패스 정보를 담을 배열
+                const pathCoords = [];
+
+                top5Markers.forEach((marker, index) => {
                     const distance = getDistance(map.getCenter(), marker.getPosition());
                     totalDistance += distance;
 
                     const listItem = document.createElement('li');
+                    const pathCoord = marker.getPosition();
 
                     listItem.textContent = `이름: ${marker.name}, 주소: ${marker.address} (거리: ${distance.toFixed(2)}m)`;
                     placeListView.appendChild(listItem);
+
+                    // 패스 정보 추가
+                    pathCoords.push(pathCoord);
+
+                    // 마지막 마커일 경우 폴리라인 추가
+                    if (index === top5Markers.length - 1) {
+                        const polyline = new kakao.maps.Polyline({
+                            path: pathCoords,
+                            strokeWeight: 3,
+                            strokeColor: '#FF0000',
+                            strokeOpacity: 0.7,
+                            strokeStyle: 'solid',
+                        });
+
+                        polyline.setMap(map);
+                    }
                 });
-
-               
             }
-
-            function displayMarkerInfo(marker) {
-                const infowindow = new kakao.maps.InfoWindow({ zIndex: 1 });
-
-                const content = `<div style="padding:5px;">${marker.name}</div>`;
-
-                infowindow.setContent(content);
-                infowindow.open(map, marker);
-            }
-
-            function getDistance(latlng1, latlng2) {
-                const polyline = new kakao.maps.Polyline({
-                    path: [latlng1, latlng2],
-                });
-
-                return polyline.getLength();
-            }
-        }
 
         kakao.maps.load(() => {
             initMap();
