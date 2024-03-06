@@ -164,7 +164,7 @@
                         customMarker.address = result[0].address_name;
 
                         // 마커에 마우스 이벤트 추가
-                        kakao.maps.event.addListener(customMarker, 'mouseover', function() {
+                        kakao.maps.event.addListener(customMarker, 'mouseover', function () {
                             displayMarkerInfo(customMarker);
                         });
 
@@ -176,14 +176,13 @@
 
             const input = document.getElementById('searchInput');
 
-            window.searchPlace = function() {
+            window.searchPlace = function () {
                 const keyword = input.value;
-                const ps = new kakao.maps.services.Places();
+                const geocoder = new kakao.maps.services.Geocoder();
 
-                ps.keywordSearch(keyword, (data, status) => {
+                geocoder.addressSearch(keyword, (result, status) => {
                     if (status === kakao.maps.services.Status.OK) {
-                        const place = data[0];
-                        const coords = new kakao.maps.LatLng(place.y, place.x);
+                        const coords = new kakao.maps.LatLng(result[0].y, result[0].x);
 
                         map.panTo(coords);
 
@@ -211,18 +210,16 @@
                 });
 
                 const top5Markers = customMarkers.slice(0, 5);
-    let totalDistance = 0;
+                let totalDistance = 0;
 
-    top5Markers.forEach(marker => {
-        const distance = getDistance(map.getCenter(), marker.getPosition()) / 1000; 
-        totalDistance += distance;
+                top5Markers.forEach(marker => {
+                    const distance = getDistance(map.getCenter(), marker.getPosition()) / 1000;
+                    totalDistance += distance;
 
-        const listItem = document.createElement('li');
-        listItem.textContent = `이름: ${marker.name}, 주소: ${marker.address} (거리: ${distance.toFixed(2)}km)`;
-        placeListView.appendChild(listItem);
-    });
-
-               
+                    const listItem = document.createElement('li');
+                    listItem.textContent = `이름: ${marker.name}, 주소: ${marker.address} (거리: ${distance.toFixed(2)}km)`;
+                    placeListView.appendChild(listItem);
+                });
             }
 
             function displayMarkerInfo(marker) {
