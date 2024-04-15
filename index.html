@@ -168,18 +168,13 @@ nav a:hover {
 { name: '	티스테이션 울산서동점	 ', address: '	울산 중구 북부순환도로 830	 ' } ,
 { name: '	한국타이어 더타이어샵 야음점	 ', address: '	울산광역시 남구 번영로 7	 ' } ,
 { name: '	티스테이션 김해점	 ', address: '	경남 김해시 가야로 506	 ' } ,
-{ name: '	제주공항존 부속차고지	 ', address: '	제주특별자치도 제주시 도두일동 2276-2 *반드시 연락처로 연락 후 입고 	 ' , note: '비고 내용 1'} ,
-{ name: '	대원상사	 ', address: '	제주특별자치도 제주시 거로중길 57-13/(연락후 입고가능)	 ' , note: '비고 내용 1'} ,
+{ name: '	제주공항존 부속차고지	 ', address: '	제주특별자치도 제주시 도두일동 2276-2 *반드시 연락처로 연락 후 입고 	 ' } ,
+{ name: '	대원상사	 ', address: '	제주특별자치도 제주시 거로중길 57-13/(연락후 입고가능)	 ' } ,
                 
             ];
             locations.forEach(location => {
                 const address = location.address;
                 const name = location.name;
-                const note = location.note; // 각 위치의 비고를 가져옵니다.
-    console.log(`장소: ${name}`);
-    console.log(`주소: ${address}`);
-    console.log(`\n비고: ${note}`); // 비고를 위치 정보 아래에 출력합니다.
-    console.log('------------------------');
 
                 const geocoder = new kakao.maps.services.Geocoder();
                 geocoder.addressSearch(address, (result, status) => {
